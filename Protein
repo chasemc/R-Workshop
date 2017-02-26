@@ -1,0 +1,148 @@
+path<-.libPaths()
+library("MALDIquantForeign", lib.loc=path)
+library("MALDIquant", lib.loc=path)
+library("ggplot2", lib.loc=path)
+library("FactoMineR",lib.loc=path)
+
+
+
+setwd("C:/Users/chase/Desktop/172 and DP3 Data For Paper/IDBac 11-02 172 Isolation")
+###Import Data
+
+spectraImport<-importMzMl(path="ProteinData")
+
+
+
+
+####Change MetaData
+for (i in 1:length(spectraImport)){
+  
+  if(is.na(strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][2]),"\\.")[[1]][1]   )){
+    spectraImport[[i]]@metaData$Taxonomy<-"Value Not Provided"
+  } else{spectraImport[[i]]@metaData$Taxonomy<-strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][2]),"\\.")[[1]][1]
+  }
+  if(is.na( strsplit((strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][2]),"\\.")[[1]][1])," ")[[1]][1]  )){
+    spectraImport[[i]]@metaData$Genus<-"Value Not Provided"
+  } else{ spectraImport[[i]]@metaData$Genus<-strsplit((strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][2]),"\\.")[[1]][1])," ")[[1]][1]
+  }
+  if(is.na(  strsplit((strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][2]),"\\.")[[1]][1])," ")[[1]][2] )){
+    spectraImport[[i]]@metaData$Species<-"Value Not Provided"
+  } else{ spectraImport[[i]]@metaData$Species<-strsplit((strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][2]),"\\.")[[1]][1])," ")[[1]][2]
+  }
+  if(is.na(  strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][1]),"_")[[1]][1] )){
+    spectraImport[[i]]@metaData$Strain<-"Value Not Provided"
+  } else{spectraImport[[i]]@metaData$Strain<-strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][1]),"_")[[1]][1]
+  }
+  if(is.na( strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][1]),"_")[[1]][2]  )){
+    spectraImport[[i]]@metaData$Media<-"Value Not Provided"
+  } else{  spectraImport[[i]]@metaData$Media<-strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][1]),"_")[[1]][2]
+  }
+  if(is.na( strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][1]),"_")[[1]][3]  )){
+    spectraImport[[i]]@metaData$Replicate<-"Value Not Provided"
+  } else{  spectraImport[[i]]@metaData$Replicate<- strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][1]),"_")[[1]][3]
+  }
+  if(is.na(  paste((strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][1]),"_")[[1]][1]),strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][1]),"_")[[1]][[2]]) )){
+    spectraImport[[i]]@metaData$StrainMedia<- "Value Not Provided"
+  } else{ spectraImport[[i]]@metaData$StrainMedia<-paste((strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][1]),"_")[[1]][1]),strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][1]),"_")[[1]][[2]])
+  }
+  if(is.na( paste((strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][1]),"_")[[1]][1]),strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][1]),"_")[[1]][[2]],strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][1]),"_")[[1]][3])  )){
+    spectraImport[[i]]@metaData$StrainMediaReplicate<- "Value Not Provided"
+  } else{spectraImport[[i]]@metaData$StrainMediaReplicate<-paste((strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][1]),"_")[[1]][1]),strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][1]),"_")[[1]][[2]],strsplit((strsplit((strsplit((strsplit(spectraImport[[i]]@metaData$file,"Desktop\\\\")[[1]][2]),"\\\\")[[1]][4]),"@")[[1]][1]),"_")[[1]][3])
+  }
+}
+
+
+
+#####Find the matrix Sample and isolate
+#labs <- sapply(spectraImport, function(x)metaData(x)$StrainMedia)
+#matrixIndex<-grep("Matrix",labs,ignore.case=TRUE)
+#mat<-spectraImport[matrixIndex]
+#spectraImport<-spectraImport[-matrixIndex]
+
+##### Separate protein and small molecule data
+proteinSpectra<-NULL
+smallSpectra<-NULL
+for (i in 1:length(spectraImport))
+{
+  if(max(spectraImport[[i]]@mass)>10000)
+  {
+    proteinSpectra<-c(proteinSpectra,spectraImport[[i]])
+  }
+  else 
+  { 
+    smallSpectra<-c(smallSpectra,spectraImport[[i]])
+  }
+}
+
+#####Average Spectra Based on Sample ID
+#labs <- sapply(smallSpectra, function(x)metaData(x)$Strain)
+#smallAveragedSpectra <-  averageMassSpectra(smallSpectra, labels=labs)
+labs <- sapply(proteinSpectra, function(x)metaData(x)$Strain)
+
+proteinAveragedSpectra <-  averageMassSpectra(proteinSpectra, labels=labs)
+
+
+###
+# Protein Spectra Preprocessing, Peak Picking, and Peak Binning
+###
+proteinAveragedSpectra <- transformIntensity(proteinAveragedSpectra,method="sqrt")
+proteinAveragedSpectra <- smoothIntensity(proteinAveragedSpectra, method="SavitzkyGolay",halfWindowSize=20)
+proteinAveragedSpectra<- removeBaseline(proteinAveragedSpectra, method="TopHat")
+proteinPeaks<-detectPeaks(proteinAveragedSpectra, method="MAD", halfWindowSize=20, SNR=12.5)
+
+#proteinPeaks<-trim(proteinPeaks,range=c(3000,15000))
+
+###Tag Unknown Samples
+
+#for (i in 1:length(proteinPeaks))
+#{
+#  proteinPeaks[[i]]@metaData$idStrain<-paste("GHOSTBUSTERS","_",proteinPeaks[[i]]@metaData$Strain,sep="")
+#}
+
+
+####Combine Protein Peak list with Library Peak list, and perform peak binning
+#setwd(knime.flow.in[["Protein_Library"]])
+#proteinPeaks<-c(proteinPeaks,readRDS("Binned Protein Library.rds"))
+proteinPeaks<-binPeaks(proteinPeaks,tolerance=.02)
+
+
+###Organize names for data frame
+#smallSamples <- factor(sapply(smallAveragedSpectra, function(x)metaData(x)$Strain))
+temp<-NULL
+for (i in 1:length(proteinPeaks)){
+  temp<-c(temp,proteinPeaks[[i]]@metaData$Strain)
+}
+
+proteinSamples<-factor(temp)
+
+###
+# Convert Small Molecule Peak lists into a useable data frame (matrix)
+###
+#SmallMoleculeTable <- intensityMatrix(smallPeaks)
+#rownames(SmallMoleculeMatrix) <- paste(smallSamples)
+
+
+###
+# Convert Protein Peak lists into a useable data frame (matrix)
+###
+proteinMatrix <- intensityMatrix(proteinPeaks)
+rownames(proteinMatrix) <- paste(proteinSamples)
+
+
+
+###
+# Write to .csv file so that later data analysis can be run without running R if you close out of KNIME
+###
+#write.csv(SmallMoleculeMatrix,"MALDIquant_SmallMolecule_PeakList.csv")
+
+
+
+
+
+mydata<-proteinMatrix
+mydata[is.na(mydata)] <- 0
+c<-PCA(mydata)
+a<-c$ind$coord
+a<-as.data.frame(a)
+cols<-c("#CB84FF","#F98D8A","#CB84FF","#CB84FF","#CB84FF","#CB84FF","#CB84FF","#29CBD1","#F98D8A","#CB84FF","#A7C127")
+ggplot(a,aes(Dim.1,Dim.3,label=rownames(a)))+geom_label(colour=cols)
