@@ -2,12 +2,16 @@ path<-.libPaths()
 library("MALDIquantForeign", lib.loc=path)
 library("MALDIquant", lib.loc=path)
 library("ggplot2", lib.loc=path)
-library("FactoMineR",lib.loc=path)
+library("ape", lib.loc=path)
+library("dendextend", lib.loc=path)
 
 
+path<-"C:/Users/chase/Desktop/Supplementary_Data_and_Code"
 
-setwd("C:/Users/chase/Desktop/172 and DP3 Data For Paper/IDBac 11-02 172 Isolation")
-###Import Data
+
+setwd(paste0(path,"/","DiversityPlate-172"))
+
+
 
 spectraImport<-importMzMl(path="ProteinData")
 
@@ -90,20 +94,14 @@ proteinAveragedSpectra <- smoothIntensity(proteinAveragedSpectra, method="Savitz
 proteinAveragedSpectra<- removeBaseline(proteinAveragedSpectra, method="TopHat")
 proteinPeaks<-detectPeaks(proteinAveragedSpectra, method="MAD", halfWindowSize=20, SNR=12.5)
 
-#proteinPeaks<-trim(proteinPeaks,range=c(3000,15000))
-
-###Tag Unknown Samples
-
-#for (i in 1:length(proteinPeaks))
-#{
-#  proteinPeaks[[i]]@metaData$idStrain<-paste("GHOSTBUSTERS","_",proteinPeaks[[i]]@metaData$Strain,sep="")
-#}
 
 
-####Combine Protein Peak list with Library Peak list, and perform peak binning
-#setwd(knime.flow.in[["Protein_Library"]])
-#proteinPeaks<-c(proteinPeaks,readRDS("Binned Protein Library.rds"))
+
+
 proteinPeaks<-binPeaks(proteinPeaks,tolerance=.02)
+
+proteinPeaks<-trim(proteinPeaks,c(3000,15000))
+
 
 
 ###Organize names for data frame
@@ -137,6 +135,10 @@ rownames(proteinMatrix) <- paste(proteinSamples)
 
 
 
+require("FactoMineR")
+
+
+
 
 
 mydata<-proteinMatrix
@@ -144,5 +146,45 @@ mydata[is.na(mydata)] <- 0
 c<-PCA(mydata)
 a<-c$ind$coord
 a<-as.data.frame(a)
-cols<-c("#CB84FF","#F98D8A","#CB84FF","#CB84FF","#CB84FF","#CB84FF","#CB84FF","#29CBD1","#F98D8A","#CB84FF","#A7C127")
-ggplot(a,aes(Dim.1,Dim.3,label=rownames(a)))+geom_label(colour=cols)
+ggplot(a,aes(Dim.1,Dim.2,label=rownames(a)))+geom_label()
+
+
+
+cosineD <- function(x){
+  as.dist(1 - x%*%t(x)/(sqrt(rowSums(x^2) %*% t(rowSums(x^2))))) 
+}
+
+
+#This ccreates a distance matrix from the peak list created in the protein processing section
+d <- cosineD(mydata)
+# Hierarchical clustering using Ward's method
+res.hc <- hclust(d)
+# Plot the obtained dendrogram
+plot(res.hc, cex = 2, hang = -1,main="Protein-Data, Cosine Distance")
+
+
+cPhylo1 <- read.tree(file = "Tree.newick")
+d2<-root(cPhylo1,1,resolve.root = TRUE)
+dend1 <- chronos(d2)
+
+d1 <- as.dendrogram(dend1)
+
+a<-as.dendrogram(res.hc)
+
+
+
+
+d<-dendlist(d1,a)
+
+
+x <- d %>% untangle(method = "step2side") 
+x %>% plot(main = paste("entanglement =", round(entanglement(x), 2)),common_subtrees_color_branches = TRUE)
+
+
+
+#This ccreates a distance matrix from the peak list created in the protein processing section
+d <- dist(mydata, method = "euclidean")
+# Hierarchical clustering using Ward's method
+res.hc <- hclust(d)
+# Plot the obtained dendrogram
+plot(res.hc, cex = 2, hang = -1,main="Protein-Data, Euclidean Distance")
