@@ -1,0 +1,17 @@
+
+varString<-"a"
+varNum<-5
+vector<-c(1,2,3)
+varNum*vector
+
+table<-cbind(vector,vector)
+table<-rbind(vector,vector)
+
+assignedVariable<-"Split ME $ HeRe-->_<--Before-This"
+splitString<-strsplit(assignedVariable,"_")
+splitString[[1]][1]
+splitString[[1]][2]
+
+
+
+
