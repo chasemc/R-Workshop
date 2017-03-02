@@ -1,17 +1,17 @@
 setwd("C:/Users/CMC/Desktop/RW/Samples")
 
 
-sampleImport<-importMzMl(path="mzml")
+spectraImport<-importMzMl(path="mzml")
 
 ###################################################################################################################
-metaData(sampleImport[[1]])
+metaData(spectraImport[[1]])
 
 ###################################################################################################################
 
 setwd("C:/Users/CMC/Desktop/RW/Library")
 
 spectraImport<-importMzMl(path="mzml")
-metaData(sampleImport[[1]])
+metaData(spectraImport[[1]])
 
 ###################################################################################################################
 remove(spectraImport)
@@ -23,7 +23,7 @@ spectraImport<-importMzMl(path="mzml")
 
 setwd("C:/Users/CMC/Desktop/RW/Library")
 
-spectraImport<-c(spectraImport(importMzMl(path="mzml")))
+spectraImport<-c(spectraImport,(importMzMl(path="mzml")))
 
 
 ####################################################################################################################
@@ -74,6 +74,9 @@ spectraImport[[1]]@metaData
 
 
 
+spectraImport(spectraImport[[1]])
+spectraImport(spectraImport[[1]])$Strain
+
 
 
 
@@ -105,9 +108,6 @@ for (i in 1:length(spectraImport))
 
 #####Average Spectra Based on Sample ID
 
-metaData(proteinSpectra[[1]])
-metaData(proteinSpectra[[1]])$Strain
-
 
 labs <- sapply(proteinSpectra, function(x)metaData(x)$Strain)
 proteinAveragedSpectra <-  averageMassSpectra(proteinSpectra, labels=labs)
@@ -116,7 +116,7 @@ proteinAveragedSpectra <-  averageMassSpectra(proteinSpectra, labels=labs)
 
 labs
 
-proteinAveragedSpectra
+proteinAveragedSpectra[[1]]
 
 
 
@@ -160,6 +160,10 @@ proteinSamples<-factor(temp)
 
 
 proteinMatrix <- intensityMatrix(proteinPeaks)
+
+
+
+
 rownames(proteinMatrix) <- paste(proteinSamples)
 
 
@@ -171,12 +175,7 @@ rownames(proteinMatrix) <- paste(proteinSamples)
 
 bool<-proteinMatrix
 bool[is.na(bool)] <- 0
-
-
-
 bool<-as.data.frame(bool)
-
-
 bool<- ifelse(bool > 0,1,0)
 
 
@@ -231,5 +230,3 @@ clustered<-cbind(row.names(h$data.clust),h$data.clust$clust)
 
 thirdGroup<-proteinAveragedSpectra[grep(group,clustered[,2])]
 thirdGroup
-
-
