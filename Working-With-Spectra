@@ -1,14 +1,23 @@
-setwd("C:/Users/CMC/Desktop/RW/Samples")
+var<-("C:/Users/CMC/Desktop/RW/")
+
+
+
+setwd(paste0(var,"Samples"))
+      
+      
+
 
 
 spectraImport<-importMzMl(path="mzml")
+
+
 
 ###################################################################################################################
 metaData(spectraImport[[1]])
 
 ###################################################################################################################
 
-setwd("C:/Users/CMC/Desktop/RW/Library")
+setwd(paste0(var,"Library"))
 
 spectraImport<-importMzMl(path="mzml")
 metaData(spectraImport[[1]])
@@ -16,13 +25,13 @@ metaData(spectraImport[[1]])
 ###################################################################################################################
 remove(spectraImport)
 
-setwd("C:/Users/CMC/Desktop/RW/Samples")
-
+setwd(paste0(var,"Samples"))
+      
 
 spectraImport<-importMzMl(path="mzml")
 
-setwd("C:/Users/CMC/Desktop/RW/Library")
-
+setwd(paste0(var,"Library"))
+      
 spectraImport<-c(spectraImport,(importMzMl(path="mzml")))
 
 
